@@ -2,6 +2,7 @@ package controller
 
 import (
 	"GO-ECOMMERCE-BACKEND-API/internal/service"
+	"GO-ECOMMERCE-BACKEND-API/response"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -26,11 +27,12 @@ func (uc *UserController) RegisterUser(c *gin.Context) {
 	}
 
 	if err := uc.UserService.Register(request.Email, request.Password); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		response.FailResponse(c, 20004, "invalid param")
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"message": "user created"})
+	//c.JSON(http.StatusCreated, gin.H{"message": "user created"})
+	response.SucessResponse(c, 20001, "User created", request.Email)
 }
 func (ctrl *UserController) CreateUser(c *gin.Context) {
 	// Thực hiện logic tạo người dùng
