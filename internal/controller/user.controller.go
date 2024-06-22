@@ -7,19 +7,35 @@ import (
 )
 
 type UserController struct {
-	userService *service.UserService
+	UserService *service.UserService
 }
 
-// Đây là một hàm khởi tạo (constructor) cho UserController.
-// Hàm này chịu trách nhiệm tạo và trả về một con trỏ tới một instance của UserController.
-func NewUserController() *UserController {
-	return &UserController{
-		userService: service.NewUserService(),
-	}
+func NewUserController(service *service.UserService) *UserController {
+	return &UserController{UserService: service}
 }
-func (uc *UserController) GetUserById(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"name":  uc.userService.GetInfoUserService(),
-		"users": []string{"Thanh", "m10", "Zidance"},
-	})
+
+func (uc *UserController) RegisterUser(c *gin.Context) {
+	var request struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+
+	if err := c.ShouldBind(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := uc.UserService.Register(request.Email, request.Password); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"message": "user created"})
+}
+func (ctrl *UserController) CreateUser(c *gin.Context) {
+	// Thực hiện logic tạo người dùng
+}
+
+func (ctrl *UserController) UpdateUser(c *gin.Context) {
+	// Thực hiện logic cập nhật người dùng
 }
